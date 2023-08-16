@@ -8,14 +8,14 @@ const Display = (props) => {
         className="min-h-[20px] text-2xl text-[orange] text-right align-text-top break-words"
       >
         <input
-          value={props.display}
+          value={props.displayFormula}
           onChange={props.onChange}
-          type="result"
+          type=""
           className="bg-[black] rounded-[5px] block text-right"
         />
       </div>
       <div id="result" className="text-[29px] text-[white] text-right">
-        result
+        {props.displayResult}
       </div>
     </div>
   );
