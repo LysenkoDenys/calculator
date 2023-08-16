@@ -16,14 +16,23 @@ const Container = () => {
     const buttonPress = arrButtons.find(
       (element) => element.keyName === keyName
     );
+    const chain = (prevInput) => prevInput + buttonPress.keyName;
     if (buttonPress.keyName === "AC") {
       setDisplayFormula("");
       setDisplayResult(0);
+    } else if (buttonPress.keyName === "=") {
+      try {
+        setDisplayResult(() => eval(displayFormula));
+        setDisplayFormula(`${displayFormula}=${displayResult}`);
+      } catch (error) {
+        setDisplayResult("Error");
+      }
     } else {
-      setDisplayFormula(buttonPress.keyName);
+      setDisplayFormula(chain);
       setDisplayResult(buttonPress.keyName);
     }
   };
+
   const pressButtonAcHandler = () => {
     setDisplayResult(1);
   };
