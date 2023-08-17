@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { evaluate } from "mathjs";
 import Button from "./Button";
 import Author from "./Author";
 import Display from "./Display";
@@ -13,17 +14,22 @@ const Container = () => {
   };
 
   const pressButtonHandler = (keyName) => {
+    const chain = (prevInput) => prevInput + buttonPress.keyName;
+    const checkValidation = /^[-+]?[0-9]+([-+*/]+[-+]?[0-9]+)*$/;
     const buttonPress = arrButtons.find(
       (element) => element.keyName === keyName
     );
-    const chain = (prevInput) => prevInput + buttonPress.keyName;
     if (buttonPress.keyName === "AC") {
       setDisplayFormula("");
       setDisplayResult(0);
     } else if (buttonPress.keyName === "=") {
       try {
-        setDisplayResult(() => eval(displayFormula));
-        setDisplayFormula(`${displayFormula}=${displayResult}`);
+        console.log(displayFormula); //
+        console.log(checkValidation.test(displayFormula)); //
+        if (checkValidation.test(displayFormula)) {
+          setDisplayResult(() => evaluate(displayFormula));
+          setDisplayFormula(`${displayFormula}=${evaluate(displayFormula)}`);
+        }
       } catch (error) {
         setDisplayResult("Error");
       }
