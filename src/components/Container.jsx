@@ -14,7 +14,7 @@ const Container = () => {
   };
 
   const pressButtonHandler = (keyName) => {
-    const chain = (prevInput) => prevInput + buttonPress.keyName;
+    const chainFormula = (prevInput) => prevInput + buttonPress.keyName;
     const checkValidation = /^[-+]?[0-9]+([-+*/]+[-+]?[0-9]+)*$/;
     const buttonPress = arrButtons.find(
       (element) => element.keyName === keyName
@@ -34,16 +34,9 @@ const Container = () => {
         setDisplayResult("Error");
       }
     } else {
-      setDisplayFormula(chain);
+      setDisplayFormula(chainFormula);
       setDisplayResult(buttonPress.keyName);
     }
-  };
-
-  const pressButtonAcHandler = () => {
-    setDisplayResult(1);
-  };
-  const pressButtonEqualHandler = () => {
-    setDisplayResult(1);
   };
 
   return (
