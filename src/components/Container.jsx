@@ -43,7 +43,7 @@ const Container = () => {
     <div className="">
       <div
         id="content"
-        className="p-[5px] bg-[white] max-w-fit border-2 border-solid  mx-auto rounded-[5px]"
+        className="p-[5px] bg-[white] max-w-fit border-2 border-solid  mx-auto rounded-[5px] max-w-[300px] md:max-w-[600px]"
       >
         <Display
           displayFormula={displayFormula}
