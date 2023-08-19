@@ -9,34 +9,57 @@ const Container = () => {
   const [displayFormula, setDisplayFormula] = useState("");
   const [displayResult, setDisplayResult] = useState(0);
 
+  const checkValidation =
+    /^(?!0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$|^(?=0\.0*[1-9]+\d*$)(?!\d*\.)(?!.*\b0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$/g;
+  // /^[-+]?[0-9]+([-+*/%]+[-+]?[0-9]+)*$/
+  // /^(?!0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$|^(?=0\.0*[1-9]+\d*$)(?!\d*\.)(?!.*\b0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$/g;
+
+  // enter by keyboard:
   const pressKeyHandler = (event) => {
-    setDisplayFormula(event.target.value);
+    const newValue = event.target.value;
+    if (checkValidation.test(newValue)) {
+      const sanitizedValue = newValue.replace(/\b0\d+/g, ""); // Remove occurrences of numbers with leading zeros
+      setDisplayFormula(sanitizedValue);
+      setDisplayResult("typing...");
+    }
   };
 
+  // enter by mouse/finger:
   const pressButtonHandler = (keyName) => {
     const chainFormula = (prevInput) => prevInput + buttonPress.keyName;
-    const checkValidation = /^[-+]?[0-9]+([-+*/]+[-+]?[0-9]+)*$/;
     const buttonPress = arrButtons.find(
       (element) => element.keyName === keyName
     );
+    // erase all data:
     if (buttonPress.keyName === "AC") {
       setDisplayFormula("");
       setDisplayResult(0);
-    } else if (buttonPress.keyName === "=") {
+      return;
+    }
+    // calculate the result:
+    if (buttonPress.keyName === "=") {
+      // if (!displayFormula) {
+      //   setDisplayFormula(0);
+      //   setDisplayResult("enter some expression");
+      // }
       try {
-        console.log(displayFormula); //
-        console.log(checkValidation.test(displayFormula)); //
         if (checkValidation.test(displayFormula)) {
           setDisplayResult(() => evaluate(displayFormula));
           setDisplayFormula(`${displayFormula}=${evaluate(displayFormula)}`);
+          return;
         }
       } catch (error) {
         setDisplayResult("Error");
       }
-    } else {
-      setDisplayFormula(chainFormula);
-      setDisplayResult(buttonPress.keyName);
     }
+    // !place without a name:
+    console.log(checkValidation.test(displayFormula)); //
+    if (checkValidation.test(displayFormula)) {
+      console.log("yeah!"); //
+      setDisplayFormula(chainFormula);
+    }
+    // setDisplayFormula(chainFormula);
+    setDisplayResult(buttonPress.keyName);
   };
 
   return (
