@@ -11,8 +11,6 @@ const Container = () => {
 
   const checkValidation =
     /^(?!0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$|^(?=0\.0*[1-9]+\d*$)(?!\d*\.)(?!.*\b0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$/g;
-  // /^[-+]?[0-9]+([-+*/%]+[-+]?[0-9]+)*$/
-  // /^(?!0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$|^(?=0\.0*[1-9]+\d*$)(?!\d*\.)(?!.*\b0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$/g;
 
   // enter by keyboard:
   const pressKeyHandler = (event) => {
@@ -38,14 +36,23 @@ const Container = () => {
     }
     // calculate the result:
     if (buttonPress.keyName === "=") {
-      // if (!displayFormula) {
-      //   setDisplayFormula(0);
-      //   setDisplayResult("enter some expression");
+      // if just press equal button:
+      if (displayFormula === "") {
+        setDisplayFormula("");
+        setDisplayResult("enter expression");
+        return;
+      }
+      // if just press equal button after get the result:
+      console.log(displayFormula); //
+      // if (displayFormula.indexOf(/=\d*$/)) {
+      //   setDisplayFormula(chainFormula);
+      //   setDisplayResult("enter expression");
+      //   return;
       // }
       try {
         if (checkValidation.test(displayFormula)) {
-          setDisplayResult(() => evaluate(displayFormula));
           setDisplayFormula(`${displayFormula}=${evaluate(displayFormula)}`);
+          setDisplayResult(() => evaluate(displayFormula));
           return;
         }
       } catch (error) {
@@ -53,13 +60,14 @@ const Container = () => {
       }
     }
     // !place without a name:
-    console.log(checkValidation.test(displayFormula)); //
-    if (checkValidation.test(displayFormula)) {
-      console.log("yeah!"); //
-      setDisplayFormula(chainFormula);
-    }
-    // setDisplayFormula(chainFormula);
+    // console.log(checkValidation.test(displayFormula)); //
+    // if (!checkValidation.test(displayFormula)) {
+    //   console.log("yeah!"); //
+    //   // setDisplayFormula(chainFormula);
+    // }
+    setDisplayFormula(chainFormula);
     setDisplayResult(buttonPress.keyName);
+    return;
   };
 
   return (
