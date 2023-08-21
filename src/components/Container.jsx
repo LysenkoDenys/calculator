@@ -34,6 +34,12 @@ const Container = () => {
       setDisplayResult(0);
       return;
     }
+    // backspace last character of data:
+    if (buttonPress.keyName === "DEL") {
+      setDisplayFormula(displayFormula.slice(0, -1));
+      setDisplayResult("del");
+      return;
+    }
     // calculate the result:
     if (buttonPress.keyName === "=") {
       // if just press equal button:
@@ -51,9 +57,7 @@ const Container = () => {
       // }
       try {
         if (checkValidation.test(displayFormula)) {
-          setDisplayFormula(
-            `${displayFormula}=${evaluate(displayFormula)}${toString()}`
-          );
+          setDisplayFormula(`${displayFormula}=${evaluate(displayFormula)}`);
           setDisplayResult(
             () =>
               evaluate(displayFormula)

@@ -12,7 +12,10 @@ const Button = (props) => {
     const className = {
       clear:
         styleDefault +
-        "text-white bg-[linear-gradient(to_top,#F50000_99%,#fff_98%,#FDFDFD_0%)] col-[1/3]",
+        "text-white bg-[linear-gradient(to_top,#F50000_99%,#fff_98%,#FDFDFD_0%)]",
+      backspace:
+        styleDefault +
+        "text-white bg-[linear-gradient(to_top,#676665_99%,#fff_98%,#FDFDFD_0%)]",
       equals:
         styleDefault +
         "text-white bg-[linear-gradient(to_top,#327323_99%,#fff_98%,#FDFDFD_0%)] row-[4/6] col-[4]",

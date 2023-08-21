@@ -4,7 +4,7 @@ const Display = (props) => {
   return (
     <div
       id="display"
-      className="bg-[linear-gradient(to_top,#3A4438_100%,#fff_98%,#FDFDFD_0%)] mb-[5px] p-[5px] rounded-[5px] max-w-[280px] md:max-w-[600px] border-2 border-solid border-[black]]"
+      className="bg-[linear-gradient(to_top,#676665_100%,#fff_98%,#FDFDFD_0%)] mb-[5px] p-[5px] rounded-[5px] max-w-[280px] md:max-w-[600px] border-2 border-solid border-[black]]"
     >
       <div
         id="formula"
