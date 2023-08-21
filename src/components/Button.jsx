@@ -2,21 +2,20 @@ import React from "react";
 
 const Button = (props) => {
   const styleDefaultAdd =
-    "bg-[linear-gradient(to_top,#D8D9DB_0%,#fff_80%,#FDFDFD_100%)] text-[#606060]";
+    "bg-[linear-gradient(to_top,#D8D9DB_0%,#fff_98%,#FDFDFD_0%)] text-[#606060]";
   const styleDefault =
-    "flex items-center justify-center cursor-pointer py-[12px] text-3xl font-bold border transition-all duration-[0.2s] ease-[ease]  rounded-[5px] border-solid border-[#8F9092] hover:shadow-[inset_0_0_3px_3px_#CECFD1] active:shadow-[inset_0_0_30px_#aaa] focus:shadow-[inset_0_0_30px_#aaa] " +
-    styleDefaultAdd;
+    "flex items-center justify-center cursor-pointer py-[12px] text-3xl font-bold border transition-all duration-[0.2s] ease-[ease]  rounded-[5px] border-solid border-[#8F9092] hover:shadow-[inset_0_0_3px_3px_#CECFD1] active:shadow-[inset_0_0_30px_#aaa] focus:shadow-[inset_0_0_30px_#aaa] ";
   const setStyle = (btn) => {
     const operators =
       styleDefault +
-      "text-white bg-[linear-gradient(to_top,#3A4438_0%,#fff_98%,#FDFDFD_0%)]";
+      "text-white bg-[linear-gradient(to_top,#3A4438_99%,#fff_98%,#FDFDFD_0%)]";
     const className = {
       clear:
         styleDefault +
-        "text-white bg-[linear-gradient(to_top,#F50000_0%,#fff_98%,#FDFDFD_0%)] col-[1/3]",
+        "text-white bg-[linear-gradient(to_top,#F50000_99%,#fff_98%,#FDFDFD_0%)] col-[1/3]",
       equals:
         styleDefault +
-        "text-white bg-[linear-gradient(to_top,#327323_0%,#fff_98%,#FDFDFD_0%)] row-[4/6] col-[4]",
+        "text-white bg-[linear-gradient(to_top,#327323_99%,#fff_98%,#FDFDFD_0%)] row-[4/6] col-[4]",
       zero: styleDefault + styleDefaultAdd + " col-[1/3]",
       add: operators,
       subtract: operators,
@@ -34,7 +33,9 @@ const Button = (props) => {
         props.onClick(props.nameButton);
       }}
       className={
-        setStyle(props.id) ? `${setStyle(props.id)}` : `${styleDefault}`
+        setStyle(props.id)
+          ? `${setStyle(props.id)}`
+          : `${styleDefault + styleDefaultAdd}`
       }
     >
       {props.nameButton}

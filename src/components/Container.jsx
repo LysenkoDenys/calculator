@@ -17,7 +17,7 @@ const Container = () => {
     const newValue = event.target.value;
     if (checkValidation.test(newValue)) {
       const sanitizedValue = newValue.replace(/\b0\d+/g, ""); // Remove occurrences of numbers with leading zeros
-      setDisplayFormula(sanitizedValue);
+      setDisplayFormula(sanitizedValue.toString());
       setDisplayResult("typing...");
     }
   };
@@ -51,8 +51,15 @@ const Container = () => {
       // }
       try {
         if (checkValidation.test(displayFormula)) {
-          setDisplayFormula(`${displayFormula}=${evaluate(displayFormula)}`);
-          setDisplayResult(() => evaluate(displayFormula));
+          setDisplayFormula(
+            `${displayFormula}=${evaluate(displayFormula)}${toString()}`
+          );
+          setDisplayResult(
+            () =>
+              evaluate(displayFormula)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, " ") //special format to separate 3 digits
+          );
           return;
         }
       } catch (error) {
