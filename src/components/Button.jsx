@@ -4,7 +4,7 @@ const Button = (props) => {
   const styleDefaultAdd =
     "bg-[linear-gradient(to_top,#D8D9DB_0%,#fff_98%,#FDFDFD_0%)] text-[#606060]";
   const styleDefault =
-    "flex items-center justify-center cursor-pointer py-[12px] text-3xl font-bold border transition-all duration-[0.2s] ease-[ease]  rounded-[5px] border-solid border-[#8F9092] hover:shadow-[inset_0_0_3px_3px_#CECFD1] active:shadow-[inset_0_0_30px_#aaa] focus:shadow-[inset_0_0_30px_#aaa] ";
+    "flex items-center justify-center cursor-pointer py-[12px] text-2xl font-bold border transition-all duration-[0.2s] ease-[ease]  rounded-[5px] border-solid border-[#8F9092] hover:shadow-[inset_0_0_3px_3px_#CECFD1] active:shadow-[inset_0_0_30px_#aaa] focus:shadow-[inset_0_0_30px_#aaa] ";
   const setStyle = (btn) => {
     const operators =
       styleDefault +

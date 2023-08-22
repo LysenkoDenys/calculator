@@ -8,6 +8,7 @@ import arrButtons from "../data/arrButtons";
 const Container = () => {
   const [displayFormula, setDisplayFormula] = useState("");
   const [displayResult, setDisplayResult] = useState(0);
+  const [lengthOfRow, setLengthOfRow] = useState(18);
 
   const checkValidation =
     /^(?!0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$|^(?=0\.0*[1-9]+\d*$)(?!\d*\.)(?!.*\b0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$/g;
@@ -16,7 +17,7 @@ const Container = () => {
   const pressKeyHandler = (event) => {
     const newValue = event.target.value;
     if (checkValidation.test(newValue)) {
-      const sanitizedValue = newValue.replace(/\b0\d+/g, ""); // Remove occurrences of numbers with leading zeros
+      const sanitizedValue = newValue.replace(/^[/*]|\b0\d+/g, ""); // Remove occurrences of numbers with leading zeros
       setDisplayFormula(sanitizedValue.toString());
       setDisplayResult("typing...");
     }
@@ -24,14 +25,28 @@ const Container = () => {
 
   // enter by mouse/finger:
   const pressButtonHandler = (keyName) => {
-    const chainFormula = (prevInput) => prevInput + buttonPress.keyName;
+    const chainFormula = (prevInput) => {
+      // prevent start from 0:
+      if (prevInput === "0" && buttonPress.keyName === "0") {
+        return prevInput;
+      }
+      // ! working:
+      // prevent multi '.' in expression:
+      if (prevInput === "." && buttonPress.keyName === ".") {
+        return prevInput;
+      }
+      return prevInput + buttonPress.keyName;
+    };
     const buttonPress = arrButtons.find(
       (element) => element.keyName === keyName
     );
     // erase all data:
     if (buttonPress.keyName === "AC") {
+      setLengthOfRow(18); // set rows of textarea after pushing "AC"
       setDisplayFormula("");
       setDisplayResult(0);
+      const input = document.querySelector("textarea");
+      input.focus();
       return;
     }
     // backspace last character of data:
@@ -42,19 +57,14 @@ const Container = () => {
     }
     // calculate the result:
     if (buttonPress.keyName === "=") {
+      setLengthOfRow(22); // set rows of textarea after pushing "="
       // if just press equal button:
-      if (displayFormula === "") {
+      if (displayFormula === "" || displayFormula.includes("=")) {
         setDisplayFormula("");
         setDisplayResult("enter expression");
         return;
       }
-      // if just press equal button after get the result:
-      console.log(displayFormula); //
-      // if (displayFormula.indexOf(/=\d*$/)) {
-      //   setDisplayFormula(chainFormula);
-      //   setDisplayResult("enter expression");
-      //   return;
-      // }
+
       try {
         if (checkValidation.test(displayFormula)) {
           setDisplayFormula(`${displayFormula}=${evaluate(displayFormula)}`);
@@ -85,12 +95,13 @@ const Container = () => {
     <div className="">
       <div
         id="content"
-        className="p-[5px] bg-[white] max-w-fit border-2 border-solid  mx-auto rounded-[5px] max-w-[300px] md:max-w-[600px]"
+        className="p-[5px] bg-[white] max-w-fit border-2 border-solid  mx-auto rounded-[5px] max-w-[300px]"
       >
         <Display
           displayFormula={displayFormula}
           onChange={pressKeyHandler}
           displayResult={displayResult}
+          lengthOfRow={lengthOfRow}
         />
         <div id="grid" className="mx-auto">
           <div
