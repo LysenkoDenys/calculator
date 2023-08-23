@@ -17,7 +17,8 @@ const Container = () => {
   const pressKeyHandler = (event) => {
     const newValue = event.target.value;
     if (checkValidation.test(newValue)) {
-      const sanitizedValue = newValue.replace(/^[/*]|\b0\d+/g, ""); // Remove occurrences of numbers with leading zeros
+      const sanitizedValue = newValue.replace(/^[/*]|\b(?<!.)0\d+/g, ""); // Remove numbers with leading zeros and start from "*/"
+      //![+-\/*]\b(?<!.)0\d+
       setDisplayFormula(sanitizedValue.toString());
       setDisplayResult("typing...");
     }
@@ -26,17 +27,26 @@ const Container = () => {
   // enter by mouse/finger:
   const pressButtonHandler = (keyName) => {
     const chainFormula = (prevInput) => {
-      // prevent start from 0:
+      // prevent start from 00:
       if (prevInput === "0" && buttonPress.keyName === "0") {
         return prevInput;
       }
-      // ! working:
-      // prevent multi '.' in expression:
+      // prevent start from '/' and '*':
+      if (prevInput.startsWith("/") || prevInput.startsWith("*")) {
+        return buttonPress.keyName;
+      }
+      // prevent start ftom '..'
       if (prevInput === "." && buttonPress.keyName === ".") {
         return prevInput;
       }
+      // prevent '..' in whole expression:
+      if (!checkValidation.test(prevInput + buttonPress.keyName)) {
+        return prevInput;
+      }
+      // prevent '..' in whole expression:
       return prevInput + buttonPress.keyName;
     };
+
     const buttonPress = arrButtons.find(
       (element) => element.keyName === keyName
     );
