@@ -17,8 +17,7 @@ const Container = () => {
   const pressKeyHandler = (event) => {
     const newValue = event.target.value;
     if (checkValidation.test(newValue)) {
-      const sanitizedValue = newValue.replace(/^[/*]|\b(?<!.)0\d+/g, ""); // Remove numbers with leading zeros and start from "*/"
-      //![+-\/*]\b(?<!.)0\d+
+      const sanitizedValue = newValue.replace(/^[/*]|\b(?<!\.)0\d+/g, ""); // Remove numbers with leading zeros and start from "*/"
       setDisplayFormula(sanitizedValue.toString());
       setDisplayResult("typing...");
     }
@@ -35,15 +34,15 @@ const Container = () => {
       if (prevInput.startsWith("/") || prevInput.startsWith("*")) {
         return buttonPress.keyName;
       }
-      // prevent start ftom '..'
-      if (prevInput === "." && buttonPress.keyName === ".") {
-        return prevInput;
-      }
       // prevent '..' in whole expression:
       if (!checkValidation.test(prevInput + buttonPress.keyName)) {
         return prevInput;
       }
-      // prevent '..' in whole expression:
+      // prevent lead '00' in whole expression and start from "*/":
+      if (!checkValidation.test(prevInput + buttonPress.keyName)) {
+        const res = prevInput + buttonPress.keyName;
+        return res.replace(/^[/*]|\b(?<!\.)0\d+/g, "");
+      }
       return prevInput + buttonPress.keyName;
     };
 
