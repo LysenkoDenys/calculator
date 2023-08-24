@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { evaluate } from "mathjs";
 import Button from "./Button";
 import Author from "./Author";
@@ -12,6 +12,8 @@ const Container = () => {
 
   const checkValidation =
     /^(?!0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$|^(?=0\.0*[1-9]+\d*$)(?!\d*\.)(?!.*\b0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$/g;
+  const checkValidationOperatorsMulti = /[+-]+[*]/g;
+  const checkValidationOperatorsDivide = /[+-]+[/]/g;
 
   // enter by keyboard:
   const pressKeyHandler = (event) => {
@@ -21,7 +23,34 @@ const Container = () => {
       setDisplayFormula(sanitizedValue.toString());
       setDisplayResult("typing...");
     }
+    // prevent '+/; -*; +*; -/' in whole expression:
+    if (checkValidationOperatorsMulti.test(newValue)) {
+      const sanitizedValue = newValue.replace(/[+-]+[*]/g, "*");
+      setDisplayFormula(sanitizedValue.toString());
+      setDisplayResult("typing...");
+    }
+    if (checkValidationOperatorsDivide.test(newValue)) {
+      const sanitizedValue = newValue.replace(/[+-]+[/]/g, "/");
+      setDisplayFormula(sanitizedValue.toString());
+      setDisplayResult("typing...");
+    }
   };
+
+  // make press Enter is equal to "=" ==========================================
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      pressButtonHandler("=");
+      console.log("Enter key was pressed");
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown); // Attach the event listener when the component mounts
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown); // Detach the event listener when the component unmounts
+    };
+  });
+  // make press Enter is equal to "=" ==========================================
 
   // enter by mouse/finger:
   const pressButtonHandler = (keyName) => {
@@ -38,11 +67,43 @@ const Container = () => {
       if (!checkValidation.test(prevInput + buttonPress.keyName)) {
         return prevInput;
       }
+      // prevent '+/; -*; +*; -/' in whole expression:
+      if (checkValidationOperatorsMulti.test(prevInput + buttonPress.keyName)) {
+        const res = prevInput + buttonPress.keyName;
+        return res.replace(/[+-]+[*]/g, "*");
+      }
+      if (
+        checkValidationOperatorsDivide.test(prevInput + buttonPress.keyName)
+      ) {
+        const res = prevInput + buttonPress.keyName;
+        return res.replace(/[+-]+[/]/g, "/");
+      }
       // prevent lead '00' in whole expression and start from "*/":
       if (!checkValidation.test(prevInput + buttonPress.keyName)) {
         const res = prevInput + buttonPress.keyName;
         return res.replace(/^[/*]|\b(?<!\.)0\d+/g, "");
       }
+
+      // continue calculating after get result:============================
+      let computation = "";
+      switch (buttonPress.keyName) {
+        case "+":
+          computation = prevInput + buttonPress.keyName;
+          break;
+        case "-":
+          computation = prevInput - buttonPress.keyName;
+          break;
+        case "*":
+          computation = prevInput * buttonPress.keyName;
+          break;
+        case "/":
+          computation = prevInput / buttonPress.keyName;
+          break;
+        default:
+          return;
+      }
+      // ==================================================================
+
       return prevInput + buttonPress.keyName;
     };
 
@@ -68,9 +129,7 @@ const Container = () => {
     if (buttonPress.keyName === "=") {
       setLengthOfRow(22); // set rows of textarea after pushing "="
       // if just press equal button:
-      if (displayFormula === "" || displayFormula.includes("=")) {
-        setDisplayFormula("");
-        setDisplayResult("enter expression");
+      if (displayFormula === "") {
         return;
       }
 
@@ -89,12 +148,7 @@ const Container = () => {
         setDisplayResult("Error");
       }
     }
-    // !place without a name:
-    // console.log(checkValidation.test(displayFormula)); //
-    // if (!checkValidation.test(displayFormula)) {
-    //   console.log("yeah!"); //
-    //   // setDisplayFormula(chainFormula);
-    // }
+
     setDisplayFormula(chainFormula);
     setDisplayResult(buttonPress.keyName);
     return;
