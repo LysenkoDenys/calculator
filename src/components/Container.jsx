@@ -85,23 +85,23 @@ const Container = () => {
       }
 
       // continue calculating after get result:============================
-      let computation = "";
-      switch (buttonPress.keyName) {
-        case "+":
-          computation = prevInput + buttonPress.keyName;
-          break;
-        case "-":
-          computation = prevInput - buttonPress.keyName;
-          break;
-        case "*":
-          computation = prevInput * buttonPress.keyName;
-          break;
-        case "/":
-          computation = prevInput / buttonPress.keyName;
-          break;
-        default:
-          return;
-      }
+      // let computation = "";
+      // switch (buttonPress.keyName) {
+      //   case "+":
+      //     computation = prevInput + buttonPress.keyName;
+      //     break;
+      //   case "-":
+      //     computation = prevInput - buttonPress.keyName;
+      //     break;
+      //   case "*":
+      //     computation = prevInput * buttonPress.keyName;
+      //     break;
+      //   case "/":
+      //     computation = prevInput / buttonPress.keyName;
+      //     break;
+      //   default:
+      //     return;
+      // }
       // ==================================================================
 
       return prevInput + buttonPress.keyName;
@@ -147,6 +147,14 @@ const Container = () => {
       } catch (error) {
         setDisplayResult("Error");
       }
+    }
+    if (
+      (buttonPress.keyName === "+" && displayFormula.includes("=")) ||
+      (buttonPress.keyName === "-" && displayFormula.includes("=")) ||
+      (buttonPress.keyName === "*" && displayFormula.includes("=")) ||
+      (buttonPress.keyName === "/" && displayFormula.includes("="))
+    ) {
+      setDisplayFormula(displayResult);
     }
 
     setDisplayFormula(chainFormula);
