@@ -140,7 +140,7 @@ const Container = () => {
       operators.includes(buttonPress.keyName) &&
       displayFormula.includes("=")
     ) {
-      setDisplayFormula(displayResult);
+      setDisplayFormula(displayResult.replace(/\s/g, ""));
     }
     // to prevent input numbers after calculations:
     if (
