@@ -9,8 +9,10 @@
 </ul>
 
 <p>Sample:</p>
-![calc](https://github.com/LysenkoDenys/calculator/assets/105970854/22e077b3-8802-4ee9-b8cf-a8bd0a91dc96)
 
+![calc](https://github.com/LysenkoDenys/calculator/assets/105970854/731896b5-53b7-43d7-a56d-2f8c0b30eae8)
+
+<br/>
 <p>This React JS project uses next plug-ins:</p>
 <ul>
 <li>https://www.npmjs.com/package/mathjs</li>
