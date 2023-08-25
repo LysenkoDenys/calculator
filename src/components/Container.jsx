@@ -14,6 +14,7 @@ const Container = () => {
     /^(?!0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$|^(?=0\.0*[1-9]+\d*$)(?!\d*\.)(?!.*\b0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$/g;
   const checkValidationOperatorsMulti = /[+-]+[*]/g;
   const checkValidationOperatorsDivide = /[+-]+[/]/g;
+  const operators = ["+", "-", "*", "/"];
 
   // enter by keyboard:
   const pressKeyHandler = (event) => {
@@ -34,13 +35,19 @@ const Container = () => {
       setDisplayFormula(sanitizedValue.toString());
       setDisplayResult("typing...");
     }
+    // continue calculations from keyboard:
+    if (
+      operators.includes(newValue.charAt(newValue.length - 1)) &&
+      displayFormula.includes("=")
+    ) {
+      pressButtonHandler(newValue.charAt(newValue.length - 1));
+    }
   };
 
   // make press Enter is equal to "=" ==========================================
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       pressButtonHandler("=");
-      console.log("Enter key was pressed");
     }
   };
 
@@ -84,26 +91,6 @@ const Container = () => {
         return res.replace(/^[/*]|\b(?<!\.)0\d+/g, "");
       }
 
-      // continue calculating after get result:============================
-      // let computation = "";
-      // switch (buttonPress.keyName) {
-      //   case "+":
-      //     computation = prevInput + buttonPress.keyName;
-      //     break;
-      //   case "-":
-      //     computation = prevInput - buttonPress.keyName;
-      //     break;
-      //   case "*":
-      //     computation = prevInput * buttonPress.keyName;
-      //     break;
-      //   case "/":
-      //     computation = prevInput / buttonPress.keyName;
-      //     break;
-      //   default:
-      //     return;
-      // }
-      // ==================================================================
-
       return prevInput + buttonPress.keyName;
     };
 
@@ -129,7 +116,7 @@ const Container = () => {
     if (buttonPress.keyName === "=") {
       setLengthOfRow(22); // set rows of textarea after pushing "="
       // if just press equal button:
-      if (displayFormula === "") {
+      if (displayFormula === "" || displayFormula.includes("=")) {
         return;
       }
 
@@ -148,13 +135,19 @@ const Container = () => {
         setDisplayResult("Error");
       }
     }
+    // to continue calculation:
     if (
-      (buttonPress.keyName === "+" && displayFormula.includes("=")) ||
-      (buttonPress.keyName === "-" && displayFormula.includes("=")) ||
-      (buttonPress.keyName === "*" && displayFormula.includes("=")) ||
-      (buttonPress.keyName === "/" && displayFormula.includes("="))
+      operators.includes(buttonPress.keyName) &&
+      displayFormula.includes("=")
     ) {
       setDisplayFormula(displayResult);
+    }
+    // to prevent input numbers after calculations:
+    if (
+      !operators.includes(buttonPress.keyName) &&
+      displayFormula.includes("=")
+    ) {
+      return;
     }
 
     setDisplayFormula(chainFormula);
