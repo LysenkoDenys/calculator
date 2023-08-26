@@ -15,6 +15,7 @@ const Container = () => {
   const checkValidationOperatorsMulti = /[+-]+[*]/g;
   const checkValidationOperatorsDivide = /[+-]+[/]/g;
   const operators = ["+", "-", "*", "/"];
+  const digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 
   // enter by keyboard:
   const pressKeyHandler = (event) => {
@@ -38,6 +39,13 @@ const Container = () => {
     // continue calculations from keyboard:
     if (
       operators.includes(newValue.charAt(newValue.length - 1)) &&
+      displayFormula.includes("=")
+    ) {
+      pressButtonHandler(newValue.charAt(newValue.length - 1));
+    }
+    // start new calculations from keyboard:
+    if (
+      digits.includes(newValue.charAt(newValue.length - 1)) &&
       displayFormula.includes("=")
     ) {
       pressButtonHandler(newValue.charAt(newValue.length - 1));
@@ -102,8 +110,7 @@ const Container = () => {
       setLengthOfRow(18); // set rows of textarea after pushing "AC"
       setDisplayFormula("");
       setDisplayResult(0);
-      const input = document.querySelector("textarea");
-      input.focus();
+      // document.querySelector("textarea").focus();
       return;
     }
     // backspace last character of data:
@@ -142,11 +149,11 @@ const Container = () => {
     ) {
       setDisplayFormula(displayResult.replace(/\s/g, ""));
     }
-    // to prevent input numbers after calculations:
-    if (
-      !operators.includes(buttonPress.keyName) &&
-      displayFormula.includes("=")
-    ) {
+    // to start new calculations:
+    if (digits.includes(buttonPress.keyName) && displayFormula.includes("=")) {
+      setDisplayFormula("");
+      setDisplayFormula(chainFormula);
+      setDisplayResult(buttonPress.keyName);
       return;
     }
 
