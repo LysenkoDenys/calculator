@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { evaluate } from "mathjs";
+import Decimal from "decimal.js";
 import Button from "./Button";
 import Author from "./Author";
 import Display from "./Display";
@@ -126,15 +127,43 @@ const Container = () => {
       if (displayFormula === "" || displayFormula.includes("=")) {
         return;
       }
-
+      // base:
       try {
         if (checkValidation.test(displayFormula)) {
-          setDisplayFormula(`${displayFormula}=${evaluate(displayFormula)}`);
+          // if includes decimals 2 digits after '.' else as many as possible:
+          //find max digits after '.':------------------------------------------------------------------
+          const calculateMaxDigitsAfterDecimal = (expression) => {
+            const numbers = expression.match(/(\d+(\.\d+)?)/g);
+
+            const maxDigits = numbers.reduce((max, number) => {
+              const [, decimalPart] = number.split(".");
+              if (decimalPart) {
+                return Math.max(max, decimalPart.length);
+              }
+              return max;
+            }, 0);
+
+            return maxDigits;
+          };
+
+          const expression = displayFormula;
+          const maxDigitsAfterDecimal =
+            calculateMaxDigitsAfterDecimal(expression);
+          //find max digits after '.'--------------------------------------------------------------------
+          const res = displayFormula.includes(".")
+            ? Math.round(
+                parseFloat(
+                  (
+                    evaluate(displayFormula) *
+                    Math.pow(10, maxDigitsAfterDecimal)
+                  ).toFixed(maxDigitsAfterDecimal)
+                )
+              ) / Math.pow(10, maxDigitsAfterDecimal)
+            : new Decimal(evaluate(displayFormula));
+
+          setDisplayFormula(`${displayFormula}=${res}`);
           setDisplayResult(
-            () =>
-              evaluate(displayFormula)
-                .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, " ") //special format to separate 3 digits
+            () => res.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") //special format to separate 3 digits
           );
           return;
         }

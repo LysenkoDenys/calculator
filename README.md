@@ -16,6 +16,7 @@
 <p>This React JS project uses next plug-ins:</p>
 <ul>
 <li>https://www.npmjs.com/package/mathjs</li>
+<li>https://www.npmjs.com/package/decimal.js</li>
 </ul>
 
 <p>Build with TailwindCSS and totally adaptive to most popular devices</p>
