@@ -15,6 +15,11 @@ const Container = () => {
     /^(?!0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$|^(?=0\.0*[1-9]+\d*$)(?!\d*\.)(?!.*\b0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$/g;
   const checkValidationOperatorsMulti = /[+-]+[*]/g;
   const checkValidationOperatorsDivide = /[+-]+[/]/g;
+  const checkValidationOperatorsPlusMinusPlus = /[+-]+[+]/g;
+  const checkValidationOperatorsPlusMinusMinus = /[+-]+[-]/g;
+  const checkValidationOperatorsMultiDividePlus = /[*/]+[+]/g;
+  const checkValidationOperatorsMultiMulti = /[*/]+[*]/g;
+  const checkValidationOperatorsDivideDivide = /[*/]+[/]/g;
   const operators = ["+", "-", "*", "/"];
   const digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 
@@ -37,6 +42,33 @@ const Container = () => {
       setDisplayFormula(sanitizedValue.toString());
       setDisplayResult("typing...");
     }
+    // prevent '++; -+; +-; --; *+; /+; **; /*; //; */' in whole expression:
+    if (checkValidationOperatorsPlusMinusPlus.test(newValue)) {
+      const sanitizedValue = newValue.replace(/[+-]+[+]/g, "+");
+      setDisplayFormula(sanitizedValue.toString());
+      setDisplayResult("typing...");
+    }
+    if (checkValidationOperatorsPlusMinusMinus.test(newValue)) {
+      const sanitizedValue = newValue.replace(/[+-]+[-]/g, "-");
+      setDisplayFormula(sanitizedValue.toString());
+      setDisplayResult("typing...");
+    }
+    if (checkValidationOperatorsMultiDividePlus.test(newValue)) {
+      const sanitizedValue = newValue.replace(/[*/]+[+]/g, "+");
+      setDisplayFormula(sanitizedValue.toString());
+      setDisplayResult("typing...");
+    }
+    if (checkValidationOperatorsMultiMulti.test(newValue)) {
+      const sanitizedValue = newValue.replace(/[*/]+[*]/g, "*");
+      setDisplayFormula(sanitizedValue.toString());
+      setDisplayResult("typing...");
+    }
+    if (checkValidationOperatorsDivideDivide.test(newValue)) {
+      const sanitizedValue = newValue.replace(/[*/]+[/]/g, "/");
+      setDisplayFormula(sanitizedValue.toString());
+      setDisplayResult("typing...");
+    }
+
     // continue calculations from keyboard:
     if (
       operators.includes(newValue.charAt(newValue.length - 1)) &&
@@ -94,6 +126,46 @@ const Container = () => {
         const res = prevInput + buttonPress.keyName;
         return res.replace(/[+-]+[/]/g, "/");
       }
+      // prevent '++; -+; +-; --; *+; /+; **; /*; //; */' in whole expression:
+      if (
+        checkValidationOperatorsPlusMinusPlus.test(
+          prevInput + buttonPress.keyName
+        )
+      ) {
+        const res = prevInput + buttonPress.keyName;
+        return res.replace(/[+-]+[+]/g, "+");
+      }
+      if (
+        checkValidationOperatorsPlusMinusMinus.test(
+          prevInput + buttonPress.keyName
+        )
+      ) {
+        const res = prevInput + buttonPress.keyName;
+        return res.replace(/[+-]+[-]/g, "-");
+      }
+      if (
+        checkValidationOperatorsMultiDividePlus.test(
+          prevInput + buttonPress.keyName
+        )
+      ) {
+        const res = prevInput + buttonPress.keyName;
+        return res.replace(/[*/]+[+]/g, "+");
+      }
+      if (
+        checkValidationOperatorsMultiMulti.test(prevInput + buttonPress.keyName)
+      ) {
+        const res = prevInput + buttonPress.keyName;
+        return res.replace(/[*/]+[*]/g, "*");
+      }
+      if (
+        checkValidationOperatorsDivideDivide.test(
+          prevInput + buttonPress.keyName
+        )
+      ) {
+        const res = prevInput + buttonPress.keyName;
+        return res.replace(/[*/]+[/]/g, "/");
+      }
+
       // prevent lead '00' in whole expression and start from "*/":
       if (!checkValidation.test(prevInput + buttonPress.keyName)) {
         const res = prevInput + buttonPress.keyName;
