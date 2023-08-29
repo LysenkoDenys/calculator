@@ -10,6 +10,15 @@ const Author = () => {
       >
         Designed And Coded By Denys Lysenko
       </a>
+      <div className="">
+        <a
+          href="https://www.linkedin.com/in/evgen-chub-412884117/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          QA By Ievgen Chub
+        </a>
+      </div>
     </div>
   );
 };

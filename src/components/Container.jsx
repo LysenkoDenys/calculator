@@ -23,6 +23,34 @@ const Container = () => {
   const operators = ["+", "-", "*", "/"];
   const digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 
+  const calculateMaxDigitsAfterDecimal = (expression) => {
+    const numbers = expression.match(/(?:\d+(\.\d+)?|.\d+)/g);
+
+    const maxDigits = numbers.reduce((max, number) => {
+      const [, decimalPart] = number.split(".");
+      if (decimalPart) {
+        return Math.max(max, decimalPart.length);
+      }
+      return max;
+    }, 0);
+
+    return maxDigits;
+  };
+
+  const calculateSumDigitsAfterDecimal = (expression) => {
+    const numbers = expression.match(/(?:\d+(\.\d+)?|.\d+)/g);
+
+    const sumDigits = numbers.reduce((sum, number) => {
+      const [, decimalPart] = number.split(".");
+      if (decimalPart) {
+        return sum + decimalPart.length;
+      }
+      return sum;
+    }, 0);
+
+    return sumDigits;
+  };
+
   // enter by keyboard:
   const pressKeyHandler = (event) => {
     const newValue = event.target.value;
@@ -107,7 +135,7 @@ const Container = () => {
       if (prevInput === "0" && buttonPress.keyName === "0") {
         return prevInput;
       }
-      // prevent start from '/' and '*':
+      // prevent start from '/' and '*' and '+' on DisplayFormula:
       if (
         prevInput.startsWith("/") ||
         prevInput.startsWith("*") ||
@@ -203,25 +231,49 @@ const Container = () => {
       if (displayFormula === "" || displayFormula.includes("=")) {
         return;
       }
+      //* just like on iphone 5+=10 or 5-=0 or 5/=1 or 5*=25:++++++++++++++++++++++++++++++++++++++++
+      if (displayFormula.match(/\d[-+/*]$/)) {
+        //for 5*=25:
+        if (displayFormula.match(/\d*$/) && displayFormula.includes(".")) {
+          const expression = `${displayFormula}${displayFormula.slice(0, -1)}`;
+          const sumDigitsAfterDecimal =
+            calculateSumDigitsAfterDecimal(expression);
+          //implement sum digits after '.' for 5*=25:
+          const res = expression.includes(".")
+            ? Math.round(
+                parseFloat(
+                  (
+                    evaluate(expression) * Math.pow(10, sumDigitsAfterDecimal)
+                  ).toFixed(sumDigitsAfterDecimal)
+                )
+              ) / Math.pow(10, sumDigitsAfterDecimal)
+            : new Decimal(evaluate(expression));
+          setDisplayFormula(`${expression}=${res}`);
+          setDisplayResult(
+            () => res.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") //special format to separate 3 digits
+          );
+          // for 5+=10 or 5-=0 or 5/=1
+        } else {
+          setDisplayFormula(
+            `${`${displayFormula}${displayFormula.slice(0, -1)}`}=${evaluate(
+              `${`${displayFormula}${displayFormula.slice(0, -1)}`}`
+            )}`
+          );
+          setDisplayResult(() =>
+            evaluate(`${`${displayFormula}${displayFormula.slice(0, -1)}`}`)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+          );
+        }
+        return;
+      }
+      //* just like on iphone 5+=25 or 5-=0 or 5/=1 or 5*=25:+++++++++++++++++++++++++++++++++++++++
+
       // base:
       try {
         if (checkValidation.test(displayFormula)) {
           // if includes decimals 2 digits after '.' else as many as possible:
           //find max digits after '.':------------------------------------------------------------------
-          const calculateMaxDigitsAfterDecimal = (expression) => {
-            const numbers = expression.match(/(?:\d+(\.\d+)?|.\d+)/g);
-
-            const maxDigits = numbers.reduce((max, number) => {
-              const [, decimalPart] = number.split(".");
-              if (decimalPart) {
-                return Math.max(max, decimalPart.length);
-              }
-              return max;
-            }, 0);
-
-            return maxDigits;
-          };
-
           const expression = displayFormula;
           const maxDigitsAfterDecimal =
             calculateMaxDigitsAfterDecimal(expression);
