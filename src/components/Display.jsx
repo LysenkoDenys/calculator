@@ -14,7 +14,7 @@ const Display = (props) => {
           onChange={props.onChange}
           autoFocus
           rows={rowsOfTextarea}
-          className="bg-[black] rounded-[5px] text-right w-full"
+          className="bg-[black] rounded-[5px] text-right w-full min-h-[30px]"
         />
       </div>
       <div

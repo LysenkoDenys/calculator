@@ -15,11 +15,11 @@ const Container = () => {
     /^(?!0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$|^(?=0\.0*[1-9]+\d*$)(?!\d*\.)(?!.*\b0\d)(?!.*\.\d*\.)[0-9+\-*/. \t\r\n]*$/g;
   const checkValidationOperatorsMulti = /[+-]+[*]/g;
   const checkValidationOperatorsDivide = /[+-]+[/]/g;
-  const checkValidationOperatorsPlusMinusPlus = /[+-]+[+]/g;
-  const checkValidationOperatorsPlusMinusMinus = /[+-]+[-]/g;
+  const checkValidationOperatorsPlusMinusPlus = /[+-.]+[+]/g;
+  const checkValidationOperatorsPlusMinusMinus = /[+-.]+[-]/g;
   const checkValidationOperatorsMultiDividePlus = /[*/]+[+]/g;
-  const checkValidationOperatorsMultiMulti = /[*/]+[*]/g;
-  const checkValidationOperatorsDivideDivide = /[*/]+[/]/g;
+  const checkValidationOperatorsMultiMulti = /[*/.]+[*]/g;
+  const checkValidationOperatorsDivideDivide = /[*/.]+[/]/g;
   const operators = ["+", "-", "*", "/"];
   const digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 
@@ -44,12 +44,12 @@ const Container = () => {
     }
     // prevent '++; -+; +-; --; *+; /+; **; /*; //; */' in whole expression:
     if (checkValidationOperatorsPlusMinusPlus.test(newValue)) {
-      const sanitizedValue = newValue.replace(/[+-]+[+]/g, "+");
+      const sanitizedValue = newValue.replace(/[+-.]+[+]/g, "+");
       setDisplayFormula(sanitizedValue.toString());
       setDisplayResult("typing...");
     }
     if (checkValidationOperatorsPlusMinusMinus.test(newValue)) {
-      const sanitizedValue = newValue.replace(/[+-]+[-]/g, "-");
+      const sanitizedValue = newValue.replace(/[+-.]+[-]/g, "-");
       setDisplayFormula(sanitizedValue.toString());
       setDisplayResult("typing...");
     }
@@ -59,12 +59,12 @@ const Container = () => {
       setDisplayResult("typing...");
     }
     if (checkValidationOperatorsMultiMulti.test(newValue)) {
-      const sanitizedValue = newValue.replace(/[*/]+[*]/g, "*");
+      const sanitizedValue = newValue.replace(/[*/.]+[*]/g, "*");
       setDisplayFormula(sanitizedValue.toString());
       setDisplayResult("typing...");
     }
     if (checkValidationOperatorsDivideDivide.test(newValue)) {
-      const sanitizedValue = newValue.replace(/[*/]+[/]/g, "/");
+      const sanitizedValue = newValue.replace(/[*/.]+[/]/g, "/");
       setDisplayFormula(sanitizedValue.toString());
       setDisplayResult("typing...");
     }
@@ -108,7 +108,11 @@ const Container = () => {
         return prevInput;
       }
       // prevent start from '/' and '*':
-      if (prevInput.startsWith("/") || prevInput.startsWith("*")) {
+      if (
+        prevInput.startsWith("/") ||
+        prevInput.startsWith("*") ||
+        prevInput.startsWith("+")
+      ) {
         return buttonPress.keyName;
       }
       // prevent '..' in whole expression:
@@ -133,7 +137,7 @@ const Container = () => {
         )
       ) {
         const res = prevInput + buttonPress.keyName;
-        return res.replace(/[+-]+[+]/g, "+");
+        return res.replace(/[+-.]+[+]/g, "+");
       }
       if (
         checkValidationOperatorsPlusMinusMinus.test(
@@ -141,7 +145,7 @@ const Container = () => {
         )
       ) {
         const res = prevInput + buttonPress.keyName;
-        return res.replace(/[+-]+[-]/g, "-");
+        return res.replace(/[+-.]+[-]/g, "-");
       }
       if (
         checkValidationOperatorsMultiDividePlus.test(
@@ -155,7 +159,7 @@ const Container = () => {
         checkValidationOperatorsMultiMulti.test(prevInput + buttonPress.keyName)
       ) {
         const res = prevInput + buttonPress.keyName;
-        return res.replace(/[*/]+[*]/g, "*");
+        return res.replace(/[*/.]+[*]/g, "*");
       }
       if (
         checkValidationOperatorsDivideDivide.test(
@@ -163,7 +167,7 @@ const Container = () => {
         )
       ) {
         const res = prevInput + buttonPress.keyName;
-        return res.replace(/[*/]+[/]/g, "/");
+        return res.replace(/[*/.]+[/]/g, "/");
       }
 
       // prevent lead '00' in whole expression and start from "*/":
@@ -205,7 +209,7 @@ const Container = () => {
           // if includes decimals 2 digits after '.' else as many as possible:
           //find max digits after '.':------------------------------------------------------------------
           const calculateMaxDigitsAfterDecimal = (expression) => {
-            const numbers = expression.match(/(\d+(\.\d+)?)/g);
+            const numbers = expression.match(/(?:\d+(\.\d+)?|.\d+)/g);
 
             const maxDigits = numbers.reduce((max, number) => {
               const [, decimalPart] = number.split(".");
