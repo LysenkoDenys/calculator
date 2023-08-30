@@ -272,26 +272,54 @@ const Container = () => {
       // base:
       try {
         if (checkValidation.test(displayFormula)) {
-          // if includes decimals 2 digits after '.' else as many as possible:
-          //find max digits after '.':------------------------------------------------------------------
-          const expression = displayFormula;
-          const maxDigitsAfterDecimal =
-            calculateMaxDigitsAfterDecimal(expression);
-          //find max digits after '.'--------------------------------------------------------------------
-          const res = displayFormula.includes(".")
-            ? Math.round(
+          if (displayFormula.includes(".")) {
+            // if includes decimals 2 digits after '.' else as many as possible:
+            //find digits after '.':------------------------------------------------------------------
+            const expression = displayFormula;
+            const maxDigitsAfterDecimal =
+              calculateMaxDigitsAfterDecimal(expression);
+            //if formula includes '*':
+            if (displayFormula.includes("*")) {
+              const sumDigitsAfterDecimal =
+                calculateSumDigitsAfterDecimal(expression);
+              //implement sum digits after '.'  0.05*0.05=0.0025:
+              const res =
+                Math.round(
+                  parseFloat(
+                    (
+                      evaluate(expression) * Math.pow(10, sumDigitsAfterDecimal)
+                    ).toFixed(sumDigitsAfterDecimal)
+                  )
+                ) / Math.pow(10, sumDigitsAfterDecimal);
+
+              setDisplayFormula(`${expression}=${res}`);
+              setDisplayResult(
+                () => res.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") //special format to separate 3 digits
+              );
+              return;
+            }
+            //find max digits after '.'--------------------------------------------------------------------
+            const res =
+              Math.round(
                 parseFloat(
                   (
                     evaluate(displayFormula) *
                     Math.pow(10, maxDigitsAfterDecimal)
                   ).toFixed(maxDigitsAfterDecimal)
                 )
-              ) / Math.pow(10, maxDigitsAfterDecimal)
-            : new Decimal(evaluate(displayFormula));
-
-          setDisplayFormula(`${displayFormula}=${res}`);
+              ) / Math.pow(10, maxDigitsAfterDecimal);
+            setDisplayFormula(`${displayFormula}=${res}`);
+            setDisplayResult(
+              () => res.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") //special format to separate 3 digits
+            );
+            return;
+          }
+          setDisplayFormula(`${displayFormula}=${evaluate(displayFormula)}`);
           setDisplayResult(
-            () => res.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") //special format to separate 3 digits
+            () =>
+              evaluate(displayFormula)
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, " ") //special format to separate 3 digits
           );
           return;
         }
