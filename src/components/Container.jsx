@@ -20,7 +20,7 @@ const Container = () => {
   const checkValidationOperatorsMultiDividePlus = /[*/]+[+]/g;
   const checkValidationOperatorsMultiMulti = /[*/.]+[*]/g;
   const checkValidationOperatorsDivideDivide = /[*/.]+[/]/g;
-  // const checkValidationOperatorsMultiMinus = /[*-]+[*]/g;
+  const checkValidationOperatorsMultiMinus = /[*/]+[-]/g;
   const operators = ["+", "-", "*", "/"];
   const digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 
@@ -52,10 +52,10 @@ const Container = () => {
     return sumDigits;
   };
 
-  // enter by keyboard:
+  // enter by keyboard:------------------------------------------------------------------------------------------------------------------------------------------------
   const pressKeyHandler = (event) => {
     const newValue = event.target.value;
-
+    console.log(`entered:${newValue}`); //
     // prevent start from 01 and change 0 to 1:
     if (newValue.match(/^0[1-9]/g)) {
       return setDisplayFormula(newValue.slice(1));
@@ -78,10 +78,6 @@ const Container = () => {
       setDisplayFormula(sanitizedValue.toString());
       setDisplayResult("typing...");
     }
-    // replace 01 with 1:
-    // if (/^0\d/.test(newValue)) {
-
-    // }
 
     // prevent '+/; -*; +*; -/' in whole expression:
     if (checkValidationOperatorsMulti.test(newValue)) {
@@ -120,11 +116,23 @@ const Container = () => {
       setDisplayFormula(sanitizedValue);
       setDisplayResult("typing...");
     }
-    // if (checkValidationOperatorsMultiMinus.test(newValue)) {
-    //   const sanitizedValue = newValue.replace(/(\*-)+\*/g, "");
-    //   setDisplayFormula(sanitizedValue);
-    //   setDisplayResult("typing...");
-    // }
+    // ! 1*- prevent any operators after that:
+    if (checkValidationOperatorsMultiMinus.test(newValue)) {
+      console.log(newValue); //
+      // const sanitizedValue = newValue.replace(/[/\*-+]$/g, "");
+      // const sanitizedValue = newValue.slice(-1);
+      // console.log(sanitizedValue); //
+      if (!newValue.match(/^(?!.*\*-(?:[+\-*/]))/g)) {
+        console.log("match"); //
+        const sanitizedValue = newValue.toString().slice(0, -1);
+        console.log(`set:${sanitizedValue}`); //
+        setDisplayFormula(sanitizedValue);
+      }
+      // setDisplayFormula(newValue);
+      setDisplayResult("typing...");
+      return;
+    }
+    // !
 
     // continue calculations from keyboard:
     if (
@@ -188,6 +196,7 @@ const Container = () => {
       if (
         checkValidationOperatorsDivide.test(prevInput + buttonPress.keyName)
       ) {
+        console.log(prevInput); //
         const res = prevInput + buttonPress.keyName;
         return res.replace(/[+-]+[/]/g, "/");
       }
@@ -197,6 +206,7 @@ const Container = () => {
           prevInput + buttonPress.keyName
         )
       ) {
+        console.log(prevInput); //
         const res = prevInput + buttonPress.keyName;
         return setDisplayFormula(res.replace(/[+-.]+[+]/g, "+"));
       }
@@ -216,12 +226,15 @@ const Container = () => {
         const res = prevInput + buttonPress.keyName;
         return setDisplayFormula(res.replace(/[*/]+[+]/g, "+"));
       }
+      // !======================================================================================================
       if (
         checkValidationOperatorsMultiMulti.test(prevInput + buttonPress.keyName)
       ) {
         const res = prevInput + buttonPress.keyName;
+        console.log(res); //
         return setDisplayFormula(res.replace(/[*/.]+[*]/g, "*"));
       }
+      // !======================================================================================================
       if (
         checkValidationOperatorsDivideDivide.test(
           prevInput + buttonPress.keyName
@@ -233,6 +246,7 @@ const Container = () => {
 
       // prevent lead '00' in whole expression and start from "*/+":
       if (!checkValidation.test(prevInput + buttonPress.keyName)) {
+        console.log(prevInput); //
         const res = prevInput + buttonPress.keyName;
         // if enter 02 inside of expression it will replace it to 2
         if (res.match(/\b(?<!\.)0\d+/g)) {
@@ -247,7 +261,7 @@ const Container = () => {
 
         return res.replace(/^[/+*]|\b(?<!\.)0\d+/g, "");
       }
-
+      console.log(prevInput + buttonPress.keyName); //
       return prevInput + buttonPress.keyName;
     };
 
@@ -268,6 +282,19 @@ const Container = () => {
       setDisplayResult("del");
       return;
     }
+    //if  press "+"" and then ="=":
+    if (buttonPress.keyName === "=" && displayResult === "+") {
+      setDisplayFormula("");
+      setDisplayResult(0);
+      return;
+    }
+    //if  press "/"" and then ="=":
+    if (buttonPress.keyName === "=" && displayResult === "/") {
+      setDisplayFormula("");
+      setDisplayResult("ERROR");
+      return;
+    }
+
     // calculate the result:
     if (buttonPress.keyName === "=") {
       setLengthOfRow(22); // set rows of textarea after pushing "="
@@ -275,6 +302,7 @@ const Container = () => {
       if (displayFormula === "" || displayFormula.includes("=")) {
         return;
       }
+
       //* just like on iphone 5+=10 or 5-=0 or 5/=1 or 5*=25:++++++++++++++++++++++++++++++++++++++++
       if (displayFormula.match(/\d[-+/*]$/)) {
         //for 5*=25:
@@ -395,7 +423,7 @@ const Container = () => {
     <div className="">
       <div
         id="content"
-        className="p-[5px] bg-[white] max-w-fit border-2 border-solid  mx-auto rounded-[5px] max-w-[300px]"
+        className="p-[5px] bg-[white] border-2 border-solid  mx-auto rounded-[5px] max-w-[300px]"
       >
         <Display
           displayFormula={displayFormula}
