@@ -20,7 +20,6 @@ const Container = () => {
   const checkValidationOperatorsMultiDividePlus = /[*/]+[+]/g;
   const checkValidationOperatorsMultiMulti = /[*/.]+[*]/g;
   const checkValidationOperatorsDivideDivide = /[*/.]+[/]/g;
-  const checkValidationOperatorsMultiMinus = /[*/]+[-]/g;
   const operators = ["+", "-", "*", "/"];
   const digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 
@@ -54,7 +53,7 @@ const Container = () => {
 
   // enter by keyboard:------------------------------------------------------------------------------------------------------------------------------------------------
   const pressKeyHandler = (event) => {
-    const newValue = event.target.value;
+    let newValue = event.target.value;
     console.log(`entered:${newValue}`); //
     // prevent start from 01 and change 0 to 1:
     if (newValue.match(/^0[1-9]/g)) {
@@ -69,6 +68,15 @@ const Container = () => {
             .toString()
             .slice(1)
       );
+    }
+
+    // * prevent input any operators after "*-" or "/-":
+    if (
+      !newValue.match(/^(?!.*\*-(?:[+\-*/]))/g) ||
+      !newValue.match(/^(?!.*\/-(?:[+\-*/]))/g)
+    ) {
+      newValue = newValue.toString().slice(0, -1);
+      setDisplayFormula(newValue);
     }
 
     if (checkValidation.test(newValue)) {
@@ -116,23 +124,6 @@ const Container = () => {
       setDisplayFormula(sanitizedValue);
       setDisplayResult("typing...");
     }
-    // ! 1*- prevent any operators after that:
-    if (checkValidationOperatorsMultiMinus.test(newValue)) {
-      console.log(newValue); //
-      // const sanitizedValue = newValue.replace(/[/\*-+]$/g, "");
-      // const sanitizedValue = newValue.slice(-1);
-      // console.log(sanitizedValue); //
-      if (!newValue.match(/^(?!.*\*-(?:[+\-*/]))/g)) {
-        console.log("match"); //
-        const sanitizedValue = newValue.toString().slice(0, -1);
-        console.log(`set:${sanitizedValue}`); //
-        setDisplayFormula(sanitizedValue);
-      }
-      // setDisplayFormula(newValue);
-      setDisplayResult("typing...");
-      return;
-    }
-    // !
 
     // continue calculations from keyboard:
     if (
@@ -168,6 +159,8 @@ const Container = () => {
   // enter by mouse/finger:-----------------------------------------------------------------------------------------------------------
   const pressButtonHandler = (keyName) => {
     const chainFormula = (prevInput) => {
+      console.log(`prevInput: ${prevInput}`); //
+      console.log(`keyName: ${keyName}`); //
       // prevent start from 00:
       if (prevInput === "0" && buttonPress.keyName === "0") {
         return prevInput;
@@ -184,6 +177,18 @@ const Container = () => {
       ) {
         return buttonPress.keyName;
       }
+
+      //!
+      // * prevent input any operators after "*-" or "/-":
+      if (
+        !(prevInput + buttonPress.keyName).match(/^(?!.*\*-(?:[+\-*/]))/g) ||
+        !(prevInput + buttonPress.keyName).match(/^(?!.*\/-(?:[+\-*/]))/g)
+      ) {
+        console.log("here!"); //
+        return setDisplayFormula(prevInput); //prevInput or newValue
+      }
+      //!
+
       // prevent '..' in whole expression:
       if (!checkValidation.test(prevInput + buttonPress.keyName)) {
         return prevInput;
@@ -226,15 +231,12 @@ const Container = () => {
         const res = prevInput + buttonPress.keyName;
         return setDisplayFormula(res.replace(/[*/]+[+]/g, "+"));
       }
-      // !======================================================================================================
       if (
         checkValidationOperatorsMultiMulti.test(prevInput + buttonPress.keyName)
       ) {
         const res = prevInput + buttonPress.keyName;
-        console.log(res); //
         return setDisplayFormula(res.replace(/[*/.]+[*]/g, "*"));
       }
-      // !======================================================================================================
       if (
         checkValidationOperatorsDivideDivide.test(
           prevInput + buttonPress.keyName
@@ -246,7 +248,6 @@ const Container = () => {
 
       // prevent lead '00' in whole expression and start from "*/+":
       if (!checkValidation.test(prevInput + buttonPress.keyName)) {
-        console.log(prevInput); //
         const res = prevInput + buttonPress.keyName;
         // if enter 02 inside of expression it will replace it to 2
         if (res.match(/\b(?<!\.)0\d+/g)) {
@@ -258,7 +259,6 @@ const Container = () => {
               .slice(1)
           );
         }
-
         return res.replace(/^[/+*]|\b(?<!\.)0\d+/g, "");
       }
       console.log(prevInput + buttonPress.keyName); //
@@ -282,13 +282,22 @@ const Container = () => {
       setDisplayResult("del");
       return;
     }
-    //if  press "+"" and then ="=":
-    if (buttonPress.keyName === "=" && displayResult === "+") {
+    //if  press "+-*/" and then "=":
+    if (
+      (buttonPress.keyName === "=" &&
+        displayResult === "+" &&
+        displayFormula === "") ||
+      (buttonPress.keyName === "=" &&
+        displayResult === "-" &&
+        displayFormula === "-") ||
+      (buttonPress.keyName === "=" &&
+        displayResult === "*" &&
+        displayFormula === "")
+    ) {
       setDisplayFormula("");
       setDisplayResult(0);
       return;
     }
-    //if  press "/"" and then ="=":
     if (buttonPress.keyName === "=" && displayResult === "/") {
       setDisplayFormula("");
       setDisplayResult("ERROR");
