@@ -54,7 +54,6 @@ const Container = () => {
   // enter by keyboard:------------------------------------------------------------------------------------------------------------------------------------------------
   const pressKeyHandler = (event) => {
     let newValue = event.target.value;
-    console.log(`entered:${newValue}`); //
     // prevent start from 01 and change 0 to 1:
     if (newValue.match(/^0[1-9]/g)) {
       return setDisplayFormula(newValue.slice(1));
@@ -73,7 +72,9 @@ const Container = () => {
     // * prevent input any operators after "*-" or "/-":
     if (
       !newValue.match(/^(?!.*\*-(?:[+\-*/]))/g) ||
-      !newValue.match(/^(?!.*\/-(?:[+\-*/]))/g)
+      !newValue.match(/^(?!.*\/-(?:[+\-*/]))/g) ||
+      !newValue.match(/^(?!.*\*-.(?:[+\-*/]))/g) ||
+      !newValue.match(/^(?!.*\/-.(?:[+\-*/]))/g)
     ) {
       newValue = newValue.toString().slice(0, -1);
       setDisplayFormula(newValue);
@@ -159,8 +160,6 @@ const Container = () => {
   // enter by mouse/finger:-----------------------------------------------------------------------------------------------------------
   const pressButtonHandler = (keyName) => {
     const chainFormula = (prevInput) => {
-      console.log(`prevInput: ${prevInput}`); //
-      console.log(`keyName: ${keyName}`); //
       // prevent start from 00:
       if (prevInput === "0" && buttonPress.keyName === "0") {
         return prevInput;
@@ -182,9 +181,10 @@ const Container = () => {
       // * prevent input any operators after "*-" or "/-":
       if (
         !(prevInput + buttonPress.keyName).match(/^(?!.*\*-(?:[+\-*/]))/g) ||
-        !(prevInput + buttonPress.keyName).match(/^(?!.*\/-(?:[+\-*/]))/g)
+        !(prevInput + buttonPress.keyName).match(/^(?!.*\/-(?:[+\-*/]))/g) ||
+        !(prevInput + buttonPress.keyName).match(/^(?!.*\*-.(?:[+\-*/]))/g) ||
+        !(prevInput + buttonPress.keyName).match(/^(?!.*\/-.(?:[+\-*/]))/g)
       ) {
-        console.log("here!"); //
         return setDisplayFormula(prevInput); //prevInput or newValue
       }
       //!
@@ -201,7 +201,6 @@ const Container = () => {
       if (
         checkValidationOperatorsDivide.test(prevInput + buttonPress.keyName)
       ) {
-        console.log(prevInput); //
         const res = prevInput + buttonPress.keyName;
         return res.replace(/[+-]+[/]/g, "/");
       }
@@ -211,7 +210,6 @@ const Container = () => {
           prevInput + buttonPress.keyName
         )
       ) {
-        console.log(prevInput); //
         const res = prevInput + buttonPress.keyName;
         return setDisplayFormula(res.replace(/[+-.]+[+]/g, "+"));
       }
@@ -261,7 +259,6 @@ const Container = () => {
         }
         return res.replace(/^[/+*]|\b(?<!\.)0\d+/g, "");
       }
-      console.log(prevInput + buttonPress.keyName); //
       return prevInput + buttonPress.keyName;
     };
 
@@ -298,7 +295,11 @@ const Container = () => {
       setDisplayResult(0);
       return;
     }
-    if (buttonPress.keyName === "=" && displayResult === "/") {
+    if (
+      buttonPress.keyName === "=" &&
+      displayResult === "/" &&
+      displayFormula === ""
+    ) {
       setDisplayFormula("");
       setDisplayResult("ERROR");
       return;
